@@ -1,0 +1,70 @@
+antenna_dict:
+  cols_data_lis: null
+  cols_key_lis: [time, scantype, az, el, ra, dec, az_center, el_center]
+  hdr_com_lis: [name of binary table, 'filename??', label for field 1, data format
+      of field 1, label for field 2, data format of field 2, label for field 3, data
+      format of field 3, data unit of field 3, label for field 4, data format of field
+      4, data unit of field 4, label for field 5, data format of field 5, data unit
+      of field 5, label for field 6, data format of field 6, data unit of field 6,
+    label for field 7, data format of field 7, data unit of field 7, label for field
+      8, data format of field 8, data unit of field 8]
+  hdr_key_lis: [EXTNAME, FILENAME]
+  hdr_val_lis: [ANTENNA, null]
+  tform: [26A, 4A, D, D, D, D, D, D]
+  tunit: [null, null, deg, deg, deg, deg, deg, deg]
+filters_dict:
+  cols_data_lis: null
+  cols_key_lis: [pixelid, kidid, kidtypes, bandpass, lorentz]
+  hdr_com_lis: [name of binary table, 'filename??', null, null, null, null, label
+      for field 1, data format of field 1, label for field 2, data format of field
+      2, label for field 3, data format of field 3, data unit of field 3, label for
+      field 4, data format of field 4, data unit of field 4]
+  hdr_key_lis: [EXTNAME, FILENAME, CTYPE3, CRVAL3, CRPIX3, CDELT3]
+  hdr_val_lis: [FILTERS, null, FREQ, 0.0, 0.0, null]
+  tform: [K, K, K, 400D, 4D]
+  tunit: [null, null, null, a.u., a.u.]
+obsinfo_dict:
+  cols_data_lis: null
+  cols_key_lis: [pixelid, offsetaz, offsetel, interval, integtime, beamsize, gain,
+    kidids, kidtypes, kidfreqs]
+  hdr_com_lis: [name of binary table, declares DESHIMA FITS, the ID of DESHIMA database,
+    name of used telecsope, site longitude in units of deg, site latitude in units
+      of deg, 'YYYY-mm-ddTHH:MM:SS', name of observer, name of observed object, right
+      ascension of the object in units of deg, declination of the object in units
+      of deg, equinox of coordinates, null, null, null, label for field 1, data format
+      of field 1, label for field 2, data format of field 2, data unit of field 2,
+    label for field 3, data format of field 3, data unit of field 3, label for field
+      4, data format of field 4, data unit of field 4, label for field 5, data format
+      of field 5, data unit of field 5, label for field 6, data format of field 6,
+    data unit of field 6, label for field 7, data format of field 7, data unit of
+      field 7, label for field 8, data format of field 8, label for field 9, data
+      format of field 9, label for field 10, data format of field 10]
+  hdr_key_lis: [EXTNAME, FITSTYPE, DDB_ID, TELESCOP, SITELON, SITELAT, DATE-OBS, OBSERVER,
+    OBJECT, RA, DEC, EQUINOX, KIDTYPE0, KIDTYPE1, KIDTYPE2]
+  hdr_val_lis: [OBSINFO, DESHIMAFITSv0, null, null, null, null, null, null, null,
+    null, null, null, signal, absorber, blind]
+  tform: [K, D, D, D, D, D, D, 49K, 49K, 49D]
+  tunit: [null, deg, deg, s, s, deg, '1', null, null, null]
+readout_dict:
+  cols_data_lis: null
+  cols_key_lis: [starttime, pixelid, arraydata]
+  hdr_com_lis: [name of binary data, 'filename??', label for field 1, data format
+      of field 1, label for field 2, data format of field 2, label for field 3, data
+      format of field 3]
+  hdr_key_lis: [EXTNAME, FILENAME]
+  hdr_val_lis: [READOUT, null]
+  tform: [26A, K, 49D]
+  tunit: [null, null, null]
+weather_dict:
+  cols_data_lis: null
+  cols_key_lis: [time, temperature, pressure, vapor-pressure, windspd, winddir]
+  hdr_com_lis: [name of binary table, 'filename??', label for field 1, data format
+      of field 1, label for field 2, data format of field 2, data unit of field 2,
+    label for field 3, data format of field 3, data unit of field 3, label for field
+      4, data format of field 4, data unit of field 4, label for field 5, data format
+      of field 5, data unit of field 5, label for field 6, data format of field 6,
+    data unit of field 6]
+  hdr_key_lis: [EXTNAME, FILENAME]
+  hdr_val_lis: [WEATHER, null]
+  tform: [19A, D, D, D, D, D]
+  tunit: [null, deg_C, hPa, hPa, m/s, deg]
