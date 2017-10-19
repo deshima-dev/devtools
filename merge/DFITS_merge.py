@@ -34,7 +34,7 @@ __all__ = ['fromaste']
 
 #-------------------------------- FUNCTIONS
 #---------------- Main
-def dfits_fromaste(obsinst, antennalog, ddb_fits, readout_data, weatherlog):
+def dfits_fromaste(antennalog, readout_data, ddb_fits, obsinst=None, weatherlog=None):
     """Read logging data of ASTE and merge them into a FITS object.
 
     Args.:
@@ -49,12 +49,18 @@ def dfits_fromaste(obsinst, antennalog, ddb_fits, readout_data, weatherlog):
     """
     hdus = fits.HDUList()
 
-    hdus.append(fits.PrimaryHDU())                              # PRIMARY
-    hdus.append(make_obsinfo(obsinst, antennalog, ddb_fits))    # OBSINFO
-    hdus.append(make_antenna(antennalog))                       # ANTENNA
-    hdus.append(make_readout(readout_data))                     # READOUT
-    hdus.append(make_filters(ddb_fits))                         # FILTERS
-    hdus.append(make_weather(weatherlog))                       # WEATHER
+    hdus.append(fits.PrimaryHDU())                                  # PRIMARY
+
+    if obsinst is not None:
+        hdus.append(make_obsinfo(obsinst, antennalog, ddb_fits))    # OBSINFO
+    hdus.append(make_antenna(antennalog))                           # ANTENNA
+
+    hdus.append(make_readout(readout_data))                         # READOUT
+
+    hdus.append(make_filters(ddb_fits))                             # FILTERS
+
+    if weatherlog is not None:
+        hdus.append(make_weather(weatherlog))                       # WEATHER
 
     return hdus
 
