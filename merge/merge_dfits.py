@@ -20,13 +20,13 @@ from astropy import units
 
 
 #-------------------------------- CONSTANTS
-TELESCOP       = 'ASTE'
-D_ASTE         = (10.0* units.m).value                                      # Diameter  of the ASTE
-LON_ASTE       = coordinates.Angle('-67d42m11.89525s').deg                  # Longitude of the ASTE
-LAT_ASTE       = coordinates.Angle('-22d58m17.69447s').deg                  # Latitude  of the ASTE
-PATH_DFITSDICT = str(Path('~/DESHIMA/devtools/merge/DFITS_dict.yaml').expanduser())
-FORM_FITSTIME  = '%Y-%m-%dT%H:%M:%S'                                        # Format of FITS TIME
-
+TELESCOP        = 'ASTE'
+D_ASTE          = (10.0* units.m).value                        # Diameter  of the ASTE
+LON_ASTE        = coordinates.Angle('-67d42m11.89525s').deg    # Longitude of the ASTE
+LAT_ASTE        = coordinates.Angle('-22d58m17.69447s').deg    # Latitude  of the ASTE
+FORM_FITSTIME   = '%Y-%m-%dT%H:%M:%S'                          # YYYY-mm-ddTHH:MM:SS
+FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:MM:SS.ss
+PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge/DFITS_dict.yaml').expanduser())
 
 #-------------------------------- PUBLIC ITEMS
 __all__ = ['fromaste']
@@ -293,7 +293,7 @@ def convert_asciitime(asciitime):
         form_fitstime = FORM_FITSTIME
     else:
         asciitime = [datetime.strptime(t, '%Y%m%d%H%M%S.%f') for t in asciitime]
-        form_fitstime = FORM_FITSTIME + '.%f'
+        form_fitstime = FORM_FITSTIME_P
 
     asciitime = [datetime.strftime(t, form_fitstime) for t in asciitime]
     return np.array(asciitime)
