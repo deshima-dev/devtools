@@ -33,7 +33,7 @@ __all__ = ['fromaste']
 
 
 #-------------------------------- FUNCTIONS
-#---------------- Main
+#------------------------ Main
 def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
     """Read logging data of ASTE and merge them into a FITS object.
 
@@ -49,7 +49,7 @@ def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
         hdus (HDUlist): HDU list containing the merged data.
     """
 
-#-------- Path
+#---------------- Path
     ddb_fits   = str(Path(ddb_fits).expanduser())
     obsinst    = str(Path(obsinst).expanduser())
     antennalog = str(Path(antennalog).expanduser())
@@ -57,7 +57,7 @@ def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
     if weatherlog is not None:
         weatherlog = str(Path(weatherlog).expanduser())
 
-#-------- Create DFITS HDUs
+#---------------- Create DFITS HDUs
     hdus = fits.HDUList()
 
     hdus.append(fits.PrimaryHDU())                              # PRIMARY
@@ -71,16 +71,16 @@ def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
     return hdus
 
 
-#---------------- Create HDUs
-#-------- OBSINFO
+#------------------------ Create HDUs
+#---------------- OBSINFO
 def make_obsinfo(ddb_fits, obsinst, antennalog):
-#---- Read 'ddb_fits'
+#-------- Read 'ddb_fits'
     with fits.open(ddb_fits) as f:
         ddb_id        = f['PRIMARY'].header['DDB_ID']
         kidsinfo_data = f['KIDSINFO'].data
         rcp_data      = f['RCP'].data
 
-#---- Read 'obsinst'
+#-------- Read 'obsinst'
     with open(obsinst, 'r') as f:
         for line in f:
             if '% OBSERVER' in line:
@@ -90,10 +90,11 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
             elif '% EPOCH' in line:
                 equinox    = line.rstrip().split('=')[1].strip('J').strip('B')    # Get EQUINOX
 
-#---- Read 'antennalog'
+#-------- Read 'antennalog'
     antennalog = ascii.read(antennalog)
-    date_obs = datetime.strptime(antennalog['time'][0].astype(np.str), '%Y%m%d%H%M%S.%f')
-    date_obs = datetime.strftime(date_obs, FORM_FITSTIME)
+#---- Get 'Date-obs' from 'antennalog'
+    date_obs   = datetime.strptime(antennalog['time'][0].astype(np.str), '%Y%m%d%H%M%S.%f')
+    date_obs   = datetime.strftime(date_obs, FORM_FITSTIME)
 
 #/*--------------------------- Not confirmed ----------------------------*/
     ra  = 0
@@ -119,11 +120,11 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
                         chunk_list(kidsinfo_data['kidtypes'], kid_num),
                         chunk_list(kidfreqs, kid_num)]
 
-#---- Read the Dictionary 'obsinfo_dict'
+#-------- Read the Dictionary 'obsinfo_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         obsinfo_dict = yaml.load(f)['obsinfo_dict']
 
-#---- Set Data to the Dictinary 'obsinfo_dict'
+#-------- Set Data to the Dictinary 'obsinfo_dict'
     obsinfo_dict['hdr_val_lis'][2:12] = [ddb_id, TELESCOP, LON_ASTE, LAT_ASTE, date_obs,
                                          observer, obs_object, ra, dec, equinox]
     obsinfo_dict['cols_data_lis']     = obsinfo_data_lis
@@ -131,25 +132,25 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
                                          str(kid_num) + 'K',
                                          str(kid_num) + 'D']
 
-#---- Create 2nd HDU 'OBSINFO'
+#-------- Create 2nd HDU 'OBSINFO'
     return createBinTableHDU(obsinfo_dict)
 
 
-#-------- ANTENNA
+#---------------- ANTENNA
 def make_antenna(antennalog):
-#---- Read 'antennalog'
     filename = os.path.basename(antennalog)
 
+#-------- Read 'antennalog'
     antlog_data = ascii.read(antennalog)
     antlog_len  = len(antlog_data) - 1
     antlog_data = antlog_data[:antlog_len]
     ant_time    = convert_asciitime(antlog_data['time'].astype(np.str))
 
-#---- Read the Dictionary 'antenna_dict'
+#-------- Read the Dictionary 'antenna_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         antenna_dict = yaml.load(f)['antenna_dict']
 
-#---- Set Data to the Dictinary 'obsinfo_dict'
+#-------- Set Data to the Dictinary 'obsinfo_dict'
     antenna_dict['hdr_val_lis'][1] = filename
     antenna_dict['cols_data_lis']  = [ant_time, antlog_data['type'],
                                       antlog_data['az-real'],
@@ -159,16 +160,16 @@ def make_antenna(antennalog):
                                       antlog_data['az-prog(center)'],
                                       antlog_data['el-prog(center)']]
 
-#---- Create 3rd. HDU 'ANTENNA'
+#-------- Create 3rd. HDU 'ANTENNA'
     return createBinTableHDU(antenna_dict)
 
 
 #-------------------- Not confirmed (for First Light) --------------------
-#-------- READOUT (Not confirmed)
+#---------------- READOUT (Not confirmed)
 def make_readout(rout_data):
-#---- Read 'readout_data'
     filename  = os.path.basename(rout_data)
 
+#-------- Read 'readout_data'
     with fits.open(rout_data) as f:
         timestamp = f[1].data['timestamp']
         I = f[1].data['data'][:, 0::2]
@@ -179,37 +180,38 @@ def make_readout(rout_data):
     pixelid   = np.zeros(len(starttime))
     arraydata = phase
 
-#---- Read the Dictionary 'readout_dict'
+#-------- Read the Dictionary 'readout_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         readout_dict = yaml.load(f)['readout_dict']
 
-#---- Set Data to the Dictinary 'readout_dict'
+#-------- Set Data to the Dictinary 'readout_dict'
     readout_dict['hdr_val_lis'][1] = os.path.basename(rout_data)
     readout_dict['cols_data_lis']  = [starttime, pixelid, arraydata]
     readout_dict['tform'][2]       = str(len(arraydata[0])) + 'D'
 
-#---- Create 4th. HDU 'READOUT'
+#-------- Create 4th. HDU 'READOUT'
     return createBinTableHDU(readout_dict)
 
 
 #/*--------------------------- Not confirmed ----------------------------*/
-#-------- FILTERS
+#---------------- FILTERS
 def make_filters(ddb_fits):
-#---- Read 'filters_data'
+    filename = os.path.basename(ddb_fits)
+
+#-------- Read 'filters_data'
     with fits.open(ddb_fits) as ddb_hdus:
         filename      = ddb_hdus['KIDSINFO'].header['FILENAME']
         kidsinfo_data = ddb_hdus['KIDSINFO'].data
 
-#---- Read the Dictionary 'filters_dict'
+#-------- Read the Dictionary 'filters_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         filters_dict = yaml.load(f)['filters_dict']
 
-#---- Set Data to the Dictinary 'readout_dict'
+#-------- Set Data to the Dictinary 'readout_dict'
     crval3 = 320.0e+09
     crpix3 = 0.0
     cdelt3 = 10.0e+06
 
-#    filters_dict['hdr_val_lis'][1] = os.path.basename(filters_data)
     filters_dict['hdr_val_lis'][1]  = filename
     filters_dict['hdr_val_lis'][3:] = [crval3, crpix3, cdelt3]
     filters_dict['cols_data_lis']   = [kidsinfo_data['pixelid'],
@@ -219,20 +221,20 @@ def make_filters(ddb_fits):
                                        kidsinfo_data['lorentz']]
     filters_dict['tform'][3] = str(len(kidsinfo_data['bandpass'][0])) + 'D'
 
-#---- Create 5th. HDU 'FILTERS'
+#-------- Create 5th. HDU 'FILTERS'
     return createBinTableHDU(filters_dict)
 #/*----------------------------------------------------------------------*/
 
 
-#-------- WEATHER
+#---------------- WEATHER
 def make_weather(weatherlog):
-#---- Read 'weatherlog'
     filename = os.path.basename(weatherlog)
 
+#-------- Read 'weatherlog'
     wealog_data = ascii.read(weatherlog)
     wea_time = convert_asciitime(wealog_data['time'].astype(np.str))
 
-#---- Set Data to the Dictinary 'weather_dict'
+#-------- Set Data to the Dictinary 'weather_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         weather_dict = yaml.load(f)['weather_dict']
 
@@ -248,13 +250,15 @@ def make_weather(weatherlog):
     return createBinTableHDU(weather_dict)
 
 
-#---------------- Others
-#-------- Create Binary Table HDU
+#------------------------ Others
+#---------------- Create Binary Table HDU
 def createBinTableHDU(data_dict):
+#-------- Set Header and Comments
     header = fits.Header()
     for (i, j, k) in zip(data_dict['hdr_key_lis'], data_dict['hdr_val_lis'], data_dict['hdr_com_lis']):
         header[i] = j, k
 
+#-------- Create Collumns of the Binary Table
     columns = [fits.Column(name=data_dict['cols_key_lis'][i],
                            format=data_dict['tform'][i],
                            array=data_dict['cols_data_lis'][i],
@@ -263,23 +267,24 @@ def createBinTableHDU(data_dict):
 
     hdu = fits.BinTableHDU.from_columns(columns, header)
 
+#-------- Add comments
     [addHeaderComments(hdu.header, list(hdu.header)[i], data_dict['hdr_com_lis'][i])
      for i in range(-(len(data_dict['hdr_com_lis']) - data_dict['hdr_com_lis'].index('label for field 1')), 0)]
 
     return hdu
 
 
-#-------- Add Comments to Header
+#---------------- Add Comments to Header
 def addHeaderComments(hdr, key, com):
     hdr.comments[key] = com
 
 
-#-------- Chunk the List
+#---------------- Chunk the List
 def chunk_list(iterable, n):
     return [iterable[i: i+n] for i in range(0, len(iterable), n)]
 
 
-#-------------------------------- Not confirmed ------------------------
+#---------------- Convert timestamps Applied FITS Times
 def convert_timestamp(timestamp):
     timestamp = [datetime.utcfromtimestamp(t) for t in timestamp]
     timestamp = [datetime.strftime(t, FORM_FITSTIME_P) for t in timestamp]
