@@ -1,9 +1,9 @@
 #  -*- coding: utf-8 -*-
 #
-#  DFITS_merge.py: Merge All HDUs and create 'DFITS'
+#  merge_dfits.py: Merge All HDUs and create 'DFITS'
 #
 #  Author : Tetsutaro Ueda
-#  Created: 2017/10/16
+#  Created: 2017/10/24
 #-------------------------------- IMPORT MODULES
 #-------- Standard Modules
 import os
