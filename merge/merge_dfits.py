@@ -264,7 +264,7 @@ def createBinTableHDU(data_dict):
     hdu = fits.BinTableHDU.from_columns(columns, header)
 
     [addHeaderComments(hdu.header, list(hdu.header)[i], data_dict['hdr_com_lis'][i])
-     for i in range(- (len(data_dict['hdr_com_lis']) - data_dict['hdr_com_lis'].index('label for field 1')), 0)]
+     for i in range(-(len(data_dict['hdr_com_lis']) - data_dict['hdr_com_lis'].index('label for field 1')), 0)]
 
     return hdu
 
@@ -282,7 +282,7 @@ def chunk_list(iterable, n):
 #-------------------------------- Not confirmed ------------------------
 def convert_timestamp(timestamp):
     timestamp = [datetime.utcfromtimestamp(t) for t in timestamp]
-    timestamp = [datetime.strftime(t, FORM_FITSTIME+'.%f') for t in timestamp]
+    timestamp = [datetime.strftime(t, FORM_FITSTIME_P) for t in timestamp]
     return np.array(timestamp)
 
 
