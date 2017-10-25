@@ -95,17 +95,19 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
 #---- Get 'Date-obs' from 'antennalog'
     date_obs   = datetime.strptime(antennalog['time'][0].astype(np.str), '%Y%m%d%H%M%S.%f')
     date_obs   = datetime.strftime(date_obs, FORM_FITSTIME)
+#---- Get 'RA' and 'DEC'
+    ra  = np.mean(antennalog['ra-prg'][:len(antennalog['ra-prg'])-1])
+    dec = np.mean(antennalog['dec-prg'][:len(antennalog['dec-prg'])-1])
 
 #/*--------------------------- Not confirmed ----------------------------*/
-    ra  = 0
-    dec = 0
-    interval  = np.ones(1)* 1/ 196
-    integtime = np.ones(1)* 1/ 196
-#    beamsize  = np.ones(1)* 1* 10** -3/ D_ASTE  #D/λ
-    beamsize  = np.ones(1)* 0.005    # 18 arcsec
+#    beamsize  = np.ones(1)* 1* 10** -3/ D_ASTE  #λ/D
+    beamsize  = np.ones(1)* 0.005               # 18 arcsec
 #    kidfreqs  = np.arange(320.0e+09, 369.0e+09, 1.0e+09)
     kidfreqs  = np.arange(320.0e+09, 376.5e+09, 0.5e+09)
+    interval  = np.ones(1)* 1/ 196
+    integtime = np.ones(1)* 1/ 196
 #/*----------------------------------------------------------------------*/
+
     kid_num   = len(kidsinfo_data['kidid'])
     kidfreqs  = kidfreqs + np.transpose(kidsinfo_data['lorentz'])[0]
 
