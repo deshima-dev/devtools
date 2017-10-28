@@ -96,8 +96,8 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
     date_obs   = datetime.strptime(antennalog['time'][0].astype(np.str), '%Y%m%d%H%M%S.%f')
     date_obs   = datetime.strftime(date_obs, FORM_FITSTIME)
 #---- Get 'RA' and 'DEC'
-    ra  = np.mean(antennalog['ra-prg'][:len(antennalog['ra-prg'])-1])
-    dec = np.mean(antennalog['dec-prg'][:len(antennalog['dec-prg'])-1])
+    ra  = np.mean(antennalog['ra-prg'][:-1])
+    dec = np.mean(antennalog['dec-prg'][:-1])
 
 #/*--------------------------- Not confirmed ----------------------------*/
 #    beamsize  = np.ones(1)* 1* 10** -3/ D_ASTE  #λ/D
