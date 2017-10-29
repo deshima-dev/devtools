@@ -29,7 +29,7 @@ FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:M
 PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge/DFITS_dict.yaml').expanduser())
 
 #-------------------------------- PUBLIC ITEMS
-__all__ = ['fromaste']
+#__all__ = ['fromaste']
 
 
 #-------------------------------- FUNCTIONS
@@ -166,21 +166,19 @@ def make_antenna(antennalog):
     return createBinTableHDU(antenna_dict)
 
 
-#-------------------- Not confirmed (for First Light) --------------------
 #---------------- READOUT (Not confirmed)
 def make_readout(rout_data):
     filename  = os.path.basename(rout_data)
 
 #-------- Read 'readout_data'
-    with fits.open(rout_data) as f:
-        timestamp = f[1].data['timestamp']
-        I = f[1].data['data'][:, 0::2]
-        Q = f[1].data['data'][:, 1::2]
-        phase = np.arctan(Q/I)
+    fake_kidid = 44
 
-    starttime = convert_timestamp(timestamp)
-    pixelid   = np.zeros(len(starttime))
-    arraydata = phase
+    with fits.open(rout_data) as f:
+        starttime = convert_timestamp(f[1].data['timestamp'])
+        pixelid_0 = np.zeros(len(starttime))
+        amplitude = np.transpose([f[1].data['Amp %d' %i] for i in range(0, 63) if i!=fake_kidid])
+        phase     = np.transpose([f[1].data['Ph %d' %i] for i in range(0, 63) if i!=fake_kidid])
+
 
 #-------- Read the Dictionary 'readout_dict'
     with open(PATH_DFITSDICT, 'r') as f:
@@ -188,8 +186,7 @@ def make_readout(rout_data):
 
 #-------- Set Data to the Dictinary 'readout_dict'
     readout_dict['hdr_val_lis'][1] = os.path.basename(rout_data)
-    readout_dict['cols_data_lis']  = [starttime, pixelid, arraydata]
-    readout_dict['tform'][2]       = str(len(arraydata[0])) + 'D'
+    readout_dict['cols_data_lis']  = [starttime, pixelid_0, amplitude, phase]
 
 #-------- Create 4th. HDU 'READOUT'
     return createBinTableHDU(readout_dict)
