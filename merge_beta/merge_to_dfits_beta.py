@@ -26,7 +26,7 @@ LON_ASTE        = coordinates.Angle('-67d42m11.89525s').deg    # Longitude of th
 LAT_ASTE        = coordinates.Angle('-22d58m17.69447s').deg    # Latitude  of the ASTE
 FORM_FITSTIME   = '%Y-%m-%dT%H:%M:%S'                          # YYYY-mm-ddTHH:MM:SS
 FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:MM:SS.ss
-PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge/DFITS_dict.yaml').expanduser())
+PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_beta/DFITS_dict.yaml').expanduser())
 
 #-------------------------------- PUBLIC ITEMS
 __all__ = ['fromaste']
