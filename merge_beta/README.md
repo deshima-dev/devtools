@@ -1,1 +1,1 @@
-# merge script (Beta1)
+# merge script (Beta)
