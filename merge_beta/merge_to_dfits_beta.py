@@ -29,7 +29,7 @@ FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:M
 PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_beta/DFITS_dict.yaml').expanduser())
 
 #-------------------------------- PUBLIC ITEMS
-__all__ = ['fromaste']
+__all__ = ['dfits_fromaste']
 
 
 #-------------------------------- FUNCTIONS
