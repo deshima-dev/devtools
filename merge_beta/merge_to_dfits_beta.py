@@ -26,7 +26,7 @@ LON_ASTE        = coordinates.Angle('-67d42m11.89525s').deg    # Longitude of th
 LAT_ASTE        = coordinates.Angle('-22d58m17.69447s').deg    # Latitude  of the ASTE
 FORM_FITSTIME   = '%Y-%m-%dT%H:%M:%S'                          # YYYY-mm-ddTHH:MM:SS
 FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:MM:SS.ss
-PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_beta/DFITS_dict.yaml').expanduser())
+PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_beta/dfits_dict.yaml').expanduser())
 
 #-------------------------------- PUBLIC ITEMS
 __all__ = ['dfits_fromaste']
@@ -102,9 +102,10 @@ def make_obsinfo(kid_mas_corresp, obsinst, antennalog):
 #-------- Read 'kid_master_corresp.csv'
     kid_vs_mas = ascii.read(kid_mas_corresp)
 #---- Get kid inromation
-    kidids   = np.array([list(kid_vs_mas['kid_id'])])
-    kid_attr = list(kid_vs_mas['attribute'])
-    kidtypes = []
+    masterids = np.array([list(kid_vs_mas['master_id'])])
+    kidids    = np.array([list(kid_vs_mas['kid_id'])])
+    kid_attr  = list(kid_vs_mas['attribute'])
+    kidtypes  = []
     for x in kid_attr:
         if x=='wideband':   attr = 0
         elif x=='filter':   attr = 1
@@ -133,7 +134,7 @@ def make_obsinfo(kid_mas_corresp, obsinst, antennalog):
                                          observer, obs_object, ra, dec, equinox]
     obsinfo_dict['cols_data_lis']     = [pixelid, offsetaz, offsetel, interval,
                                          integtime, beamsize, gain,
-                                         kidids, kidtypes, kidfreqs]
+                                         masterids, kidids, kidtypes, kidfreqs]
 
 #-------- Create 2nd HDU 'OBSINFO'
     return createBinTableHDU(obsinfo_dict)
