@@ -48,14 +48,14 @@ obsinfo_dict:
   tunit: [null, deg, deg, s, s, deg, '1', null, null, null, GHz]
 readout_dict:
   cols_data_lis: null
-  cols_key_lis: [starttime, pixelid, power]
+  cols_key_lis: [starttime, pixelid, Tsignal, Psignal]
   hdr_com_lis: [name of binary data, 'filename??', label for field 1, data format
       of field 1, label for field 2, data format of field 2, label for field 3, data
-      format of field 3]
+      format of field 3, label for field 4, data format of field 4]
   hdr_key_lis: [EXTNAME, FILENAME]
   hdr_val_lis: [READOUT, null]
-  tform: [26A, K, 63D]
-  tunit: [null, null, null]
+  tform: [26A, K, 63D, 63D]
+  tunit: [null, null, K, W]
 weather_dict:
   cols_data_lis: null
   cols_key_lis: [time, temperature, pressure, vapor-pressure, windspd, winddir]

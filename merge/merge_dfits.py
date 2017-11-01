@@ -188,8 +188,9 @@ def make_readout(ddb_fits, rout_data):
 
 #---- Caliblate 'Amplitude' and 'Phase' to 'Power'
     Troom = 17. + 273.    # K, cabin temperature
-    Tsignal, Psignal = calibrate_to_power(Troom, rhdus, ddb)
-    Parray = Psignal.T
+    Tsignal, Psignal = calibrate_to_power(pixelid_0[0], Troom, rhdus, ddb)
+    Tsignal = Tsignal.T
+    Psignal = Psignal.T
 
 #---- Close 'ddb_fits' and 'rout_data'
     ddb.close()
@@ -201,7 +202,7 @@ def make_readout(ddb_fits, rout_data):
 
 #-------- Set Data to the Dictinary 'readout_dict'
     readout_dict['hdr_val_lis'][1] = os.path.basename(rout_data)
-    readout_dict['cols_data_lis']  = [starttime, pixelid_0, Parray]
+    readout_dict['cols_data_lis']  = [starttime, pixelid_0, Tsignal, Psignal]
 
 #-------- Create 4th. HDU 'READOUT'
     return createBinTableHDU(readout_dict)
@@ -321,8 +322,8 @@ def func(x, p0, p1):
     return p0*np.sqrt(x) + p1
     #return p0*(np.sqrt(x)-np.sqrt(x[0])) + p1
 
-def calibrate_to_power(Troom, rhdus, ddb):
-    nkid = rhdus['READOUT'].header['NKID']
+def calibrate_to_power(pixelid, Troom, rhdus, ddb):
+    nkid = rhdus['READOUT'].header['NKID%d' %pixelid]
 
     kiddict = {}
     for i,j in zip(ddb['KIDFILT'].data['kidid'],ddb['KIDFILT'].data['masterid']):
