@@ -26,7 +26,7 @@ filters_dict:
 obsinfo_dict:
   cols_data_lis: null
   cols_key_lis: [pixelid, offsetaz, offsetel, interval, integtime, beamsize, gain,
-    kidids, kidtypes, kidfreqs]
+    masterids, kidids, kidtypes, kidfreqs]
   hdr_com_lis: [name of binary table, declares DESHIMA FITS, the ID of DESHIMA database,
     name of used telecsope, site longitude in units of deg, site latitude in units
       of deg, 'YYYY-mm-ddTHH:MM:SS', name of observer, name of observed object, right
@@ -38,24 +38,24 @@ obsinfo_dict:
       of field 5, data unit of field 5, label for field 6, data format of field 6,
     data unit of field 6, label for field 7, data format of field 7, data unit of
       field 7, label for field 8, data format of field 8, label for field 9, data
-      format of field 9, label for field 10, data format of field 10, data unit of
-      field 10]
+      format of field 9, label for field 10, data format of field 10, label for field
+      11, data format of field 11, data unit of field 11]
   hdr_key_lis: [EXTNAME, FITSTYPE, DDB_ID, TELESCOP, SITELON, SITELAT, DATE-OBS, OBSERVER,
     OBJECT, RA, DEC, EQUINOX, KIDTYPE0, KIDTYPE1, KIDTYPE2]
   hdr_val_lis: [OBSINFO, DESHIMAFITSv0, null, null, null, null, null, null, null,
     null, null, null, wideband, filter, blind]
-  tform: [K, D, D, D, D, D, D, 62K, 62K, 62D]
-  tunit: [null, deg, deg, s, s, deg, '1', null, null, GHz]
+  tform: [K, D, D, D, D, D, D, 63K, 63K, 63K, 63D]
+  tunit: [null, deg, deg, s, s, deg, '1', null, null, null, GHz]
 readout_dict:
   cols_data_lis: null
-  cols_key_lis: [starttime, pixelid, amplitude, phase]
+  cols_key_lis: [starttime, pixelid, power]
   hdr_com_lis: [name of binary data, 'filename??', label for field 1, data format
       of field 1, label for field 2, data format of field 2, label for field 3, data
-      format of field 3, label for field 4, data format of field 4]
+      format of field 3]
   hdr_key_lis: [EXTNAME, FILENAME]
   hdr_val_lis: [READOUT, null]
-  tform: [26A, K, 62D, 62D]
-  tunit: [null, null, null, null]
+  tform: [26A, K, 63D]
+  tunit: [null, null, null]
 weather_dict:
   cols_data_lis: null
   cols_key_lis: [time, temperature, pressure, vapor-pressure, windspd, winddir]

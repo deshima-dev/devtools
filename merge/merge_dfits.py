@@ -63,8 +63,8 @@ def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
     hdus.append(fits.PrimaryHDU())                              # PRIMARY
     hdus.append(make_obsinfo(ddb_fits, obsinst, antennalog))    # OBSINFO
     hdus.append(make_antenna(antennalog))                       # ANTENNA
-    hdus.append(make_readout(rout_data))                        # READOUT
-#    hdus.append(make_filters(ddb_fits))                         # FILTERS
+    hdus.append(make_readout(ddb_fits, rout_data))                        # READOUT
+
     if weatherlog is not None:
         hdus.append(make_weather(weatherlog))                   # WEATHER
 
@@ -74,13 +74,7 @@ def dfits_fromaste(ddb_fits, obsinst, antennalog, rout_data, weatherlog=None):
 #------------------------ Create HDUs
 #---------------- OBSINFO
 def make_obsinfo(ddb_fits, obsinst, antennalog):
-#-------- Read 'ddb_fits'
-    with fits.open(ddb_fits) as f:
-        ddb_id        = f['PRIMARY'].header['DDB_ID']
-        kidsinfo_data = f['KIDSINFO'].data
-        rcp_data      = f['RCP'].data
-
-#-------- Read 'obsinst'
+    #-------- Read 'obsinst'
     with open(obsinst, 'r') as f:
         for line in f:
             if '% OBSERVER' in line:
@@ -90,53 +84,68 @@ def make_obsinfo(ddb_fits, obsinst, antennalog):
             elif '% EPOCH' in line:
                 equinox    = line.rstrip().split('=')[1].strip('J').strip('B')    # Get EQUINOX
 
-#-------- Read 'antennalog'
+    #-------- Read 'antennalog'
     antennalog = ascii.read(antennalog)
-#---- Get 'Date-obs' from 'antennalog'
+    #---- Get 'Date-obs' from 'antennalog'
     date_obs   = datetime.strptime(antennalog['time'][0].astype(np.str), '%Y%m%d%H%M%S.%f')
     date_obs   = datetime.strftime(date_obs, FORM_FITSTIME)
-#---- Get 'RA' and 'DEC'
+    #---- Get 'RA' and 'DEC'
     ra  = np.mean(antennalog['ra-prg'][:-1])
     dec = np.mean(antennalog['dec-prg'][:-1])
 
-#/*--------------------------- Not confirmed ----------------------------*/
-#    beamsize  = np.ones(1)* 1* 10** -3/ D_ASTE  #λ/D
-    beamsize  = np.ones(1)* 0.005               # 18 arcsec
-#    kidfreqs  = np.arange(320.0e+09, 369.0e+09, 1.0e+09)
-    kidfreqs  = np.arange(320.0e+09, 376.5e+09, 0.5e+09)
-    interval  = np.ones(1)* 1/ 196
-    integtime = np.ones(1)* 1/ 196
-#/*----------------------------------------------------------------------*/
+    dh = fits.open(ddb_fits)
+    pixelid   = dh['KIDRCP'].data['pixelid']
+    offsetaz  = dh['KIDRCP'].data['offsetaz']
+    offsetel  = dh['KIDRCP'].data['offsetel']
+    interval  = np.array([1/ 196])
+    integtime = np.array([1/ 196])
+    beamsize  = np.array([0.005])
+    gain      = dh['KIDRCP'].data['gain']
+    mas_vs_attr = [[x, y]
+                   for (x, y) in zip(
+                       list(dh['KIDDES'].data['masterid']),
+                       list(dh['KIDDES'].data['attribute']))]
+    del mas_vs_attr[13:17]
+    mas_vs_attr.append([-1, np.nan])
+    mas_vs_kid  = [[x, y, z[0]]
+                   for (x, y, z) in zip(
+                       dh['KIDFILT'].data['masterid'],
+                       dh['KIDFILT'].data['kidid'],
+                       dh['KIDFILT'].data['F_filter, dF_filter'])]
+    mas_kid_corresp = [[x[0], x[1], y[1], x[2]]
+                       for (x, y) in zip(
+                           sorted(mas_vs_kid, key=lambda x: x[0]),
+                           sorted(mas_vs_attr, key=lambda x: x[0]))]
+    mas_kid_corresp = sorted(mas_kid_corresp, key=lambda x: x[1])
 
-    kid_num   = len(kidsinfo_data['kidid'])
-    kidfreqs  = kidfreqs + np.transpose(kidsinfo_data['lorentz'])[0]
+    ddbid = dh['PRIMARY'].header['DDB_ID']
+    dh.close()
+    mas_kid_corresp = list(map(list, zip(*mas_kid_corresp)))
+    masterids = [mas_kid_corresp[0]]
+    kidids    = [mas_kid_corresp[1]]
+    kidattr   = mas_kid_corresp[2]
+    kidfreqs  = [mas_kid_corresp[3]]
 
-    obsinfo_data_lis = [rcp_data['pixelid'],
-                        rcp_data['offsetaz'],
-                        rcp_data['offsetel'],
-                        interval,
-                        integtime,
-                        beamsize,
-                        rcp_data['gain'],
-                        chunk_list(kidsinfo_data['kidid'], kid_num),
-                        chunk_list(kidsinfo_data['kidtypes'], kid_num),
-                        chunk_list(kidfreqs, kid_num)]
-
-#-------- Read the Dictionary 'obsinfo_dict'
+    kidtypes = []
+    for x in kidattr:
+        if x=='wideband':   attr = 0
+        elif x=='filter':   attr = 1
+        elif x=='blind':    attr = 2
+        else:               attr = np.nan
+        kidtypes.append(attr)
+    kidtypes = [kidtypes]
+    obsinfo_data_lis = [pixelid, offsetaz, offsetel, interval, integtime, beamsize, gain,
+                        masterids, kidids, kidtypes, kidfreqs]
+     #-------- Read the Dictionary 'obsinfo_dict'
     with open(PATH_DFITSDICT, 'r') as f:
         obsinfo_dict = yaml.load(f)['obsinfo_dict']
 
-#-------- Set Data to the Dictinary 'obsinfo_dict'
-    obsinfo_dict['hdr_val_lis'][2:12] = [ddb_id, TELESCOP, LON_ASTE, LAT_ASTE, date_obs,
+    #-------- Set Data to the Dictinary 'obsinfo_dict'
+    obsinfo_dict['hdr_val_lis'][2:12] = [ddbid, TELESCOP, LON_ASTE, LAT_ASTE, date_obs,
                                          observer, obs_object, ra, dec, equinox]
     obsinfo_dict['cols_data_lis']     = obsinfo_data_lis
-    obsinfo_dict['tform'][7:10]       = [str(kid_num) + 'K',
-                                         str(kid_num) + 'K',
-                                         str(kid_num) + 'D']
 
-#-------- Create 2nd HDU 'OBSINFO'
     return createBinTableHDU(obsinfo_dict)
-
 
 #---------------- ANTENNA
 def make_antenna(antennalog):
@@ -167,18 +176,24 @@ def make_antenna(antennalog):
 
 
 #---------------- READOUT (Not confirmed)
-def make_readout(rout_data):
+def make_readout(ddb_fits, rout_data):
     filename  = os.path.basename(rout_data)
 
-#-------- Read 'readout_data'
-    fake_kidid = 44
+#-------- Read 'ddb_fits' and 'rout_data'
+    ddb   = fits.open(ddb_fits)
+    rhdus = fits.open(rout_data)
 
-    with fits.open(rout_data) as f:
-        starttime = convert_timestamp(f[1].data['timestamp'])
-        pixelid_0 = np.zeros(len(starttime))
-        amplitude = np.transpose([f[1].data['Amp %d' %i] for i in range(0, 63) if i!=fake_kidid])
-        phase     = np.transpose([f[1].data['Ph %d' %i] for i in range(0, 63) if i!=fake_kidid])
+    starttime = convert_timestamp(rhdus['READOUT'].data['timestamp'])
+    pixelid_0 = rhdus['READOUT'].data['pixelid']
 
+#---- Caliblate 'Amplitude' and 'Phase' to 'Power'
+    Troom = 17. + 273.    # K, cabin temperature
+    Tsignal, Psignal = calibrate_to_power(Troom, rhdus, ddb)
+    Parray = Psignal.T
+
+#---- Close 'ddb_fits' and 'rout_data'
+    ddb.close()
+    rhdus.close()
 
 #-------- Read the Dictionary 'readout_dict'
     with open(PATH_DFITSDICT, 'r') as f:
@@ -186,7 +201,7 @@ def make_readout(rout_data):
 
 #-------- Set Data to the Dictinary 'readout_dict'
     readout_dict['hdr_val_lis'][1] = os.path.basename(rout_data)
-    readout_dict['cols_data_lis']  = [starttime, pixelid_0, amplitude, phase]
+    readout_dict['cols_data_lis']  = [starttime, pixelid_0, Parray]
 
 #-------- Create 4th. HDU 'READOUT'
     return createBinTableHDU(readout_dict)
@@ -301,3 +316,54 @@ def convert_asciitime(asciitime):
 
     asciitime = [datetime.strftime(t, form_fitstime) for t in asciitime]
     return np.array(asciitime)
+
+def func(x, p0, p1):
+    return p0*np.sqrt(x) + p1
+    #return p0*(np.sqrt(x)-np.sqrt(x[0])) + p1
+
+def calibrate_to_power(Troom, rhdus, ddb):
+    nkid = rhdus['READOUT'].header['NKID']
+
+    kiddict = {}
+    for i,j in zip(ddb['KIDFILT'].data['kidid'],ddb['KIDFILT'].data['masterid']):
+        kiddict[i] = j
+    #print( len(kiddict), kiddict )
+
+    linphase = np.transpose( [rhdus['READOUT'].data['Amp, Ph, linPh %d' %i].T[2] for i in range(nkid)] )
+    linyfc   = rhdus['KIDSINFO'].data['yfc, linyfc'].T[1]
+    Qr       = rhdus['KIDSINFO'].data['Qr, dQr (300K)'].T[0]
+
+    fshift = np.array( (linphase-linyfc)/4./Qr ).T
+    #print(np.shape(fshift), fshift[0])
+
+    ##### responsivity curve
+    (p0, dp0, p1, dp1) = ddb['KIDRESP'].data['fit params'].T
+    Tload = ddb['KIDRESP'].data['Raw Tload']
+    Pload = ddb['KIDRESP'].data['Raw Pload']
+
+    y = func(Tload.T, p0, p1) - func(Troom, p0, p1)
+    y = y.T
+    #print(np.shape(y), y[0])
+
+    #####
+    ##### interpolate
+    import scipy.interpolate
+    Tsignal = []
+    for i in range(nkid):
+        masterid = kiddict[i]
+        if masterid<0:
+            Tsignal.append( [np.nan for i in range( len(fshift[i]) )] )
+            continue
+
+        #print(i, y[i], Tload[i])
+        tck = scipy.interpolate.splrep(y[i], Tload[i], s=0)
+        Tsignal.append( scipy.interpolate.splev(fshift[i], tck, der=0) )
+
+    #####
+    ##### convert to power
+    Psignal = []
+    for i in range(nkid):
+        tck = scipy.interpolate.splrep(Tload[i], Pload[i], s=0)
+        Psignal.append( scipy.interpolate.splev(Tsignal[i], tck, der=0) )
+
+    return np.array(Tsignal), np.array(Psignal)
