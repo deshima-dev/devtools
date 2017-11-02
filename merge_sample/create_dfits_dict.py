@@ -75,7 +75,7 @@ def obsinfo_dict():
     col_form = OrderedDict([('pixelid', 'K'), ('offsetaz', 'D'), ('offsetel', 'D'),
                             ('interval', 'D'), ('integtime', 'D'), ('beamsize', 'D'),
                             ('gain', 'D'), ('masterids', '63K'), ('kidids', '63K'),
-                            ('kidtypes', '63D'), ('kidfreqs', '63D')])
+                            ('kidtypes', '63K'), ('kidfreqs', '63D')])
     col_unit = OrderedDict([('pixelid', None), ('offsetaz', 'deg'), ('offsetel', 'deg'),
                             ('interval', 's'), ('integtime', 's'), ('beamsize', 'deg'),
                             ('gain', '1'), ('masterids', None), ('kidids', None),

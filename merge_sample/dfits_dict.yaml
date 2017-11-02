@@ -101,7 +101,7 @@ obsinfo_dict:
     - - kidids
       - 63K
     - - kidtypes
-      - 63D
+      - 63K
     - - kidfreqs
       - 63D
   col_unit: !!python/object/apply:collections.OrderedDict

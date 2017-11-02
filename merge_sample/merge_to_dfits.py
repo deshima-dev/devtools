@@ -23,7 +23,7 @@ TELESCOP        = 'ASTE'
 D_ASTE          = (10.0* units.m).value                        # Diameter  of the ASTE
 LON_ASTE        = coordinates.Angle('-67d42m11.89525s').deg    # Longitude of the ASTE
 LAT_ASTE        = coordinates.Angle('-22d58m17.69447s').deg    # Latitude  of the ASTE
-PATH_DFITSDICT  = str(Path('~/DESHIMA/merge_sample/dfits_dict.yaml').expanduser())
+PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_sample/dfits_dict.yaml').expanduser())
 
 
 class MergeToDfits:
