@@ -99,6 +99,9 @@ class MergeToDfits:
 #---------------- Merge to DFITS
     @property
     def dfits(self):
+        """
+            HDU list of DFITS
+        """
         hdus = fits.HDUList()
         hdus.append(fits.PrimaryHDU())   # PRIMARY
         hdus.append(self.obsinfo)        # OBSINFO
@@ -112,6 +115,9 @@ class MergeToDfits:
 #---------------- OBSINFO
     @property
     def obsinfo(self):
+        """
+            HDU of 'OBSINFO'
+        """
 #-------- Get the Dicitinary of 'OBSINFO': 'obsinfo_dict'
         od = self.dfits_dict['obsinfo_dict']
 #-------- Get Header Values
@@ -152,6 +158,9 @@ class MergeToDfits:
 #---------------- ANTENNA
     @property
     def antenna(self):
+        """
+            HDU of 'ANTENNA'
+        """
 #-------- Get the Dicitinary of 'ANTENNA': 'antenna_dict'
         ad = self.dfits_dict['antenna_dict']
 #---- Get Header Values
@@ -177,6 +186,9 @@ class MergeToDfits:
 #---------------- READOUT
     @property
     def readout(self):
+        """
+            HDU of 'READOUT'
+        """
 #-------- Get the Dicitinary of 'READOUT': 'readout_dict'
         rd = self.dfits_dict['readout_dict']
 #---- Get Header Values
@@ -199,6 +211,9 @@ class MergeToDfits:
 #---------------- WEATHER
     @property
     def weather(self):
+        """
+            HDU of 'WEATHER'
+        """
 #-------- Error Handling: Case of 'weatherlog' is None
         if self.wflag == 0:
             raise ValueError('No "weatherlog" is inputed!!')
