@@ -1,5 +1,9 @@
 # -*- coding utf-8 -*-
 #
+# functions.py: Define functions for merge script
+#
+# Author : Tetsutaro Ueda
+# Created: 2017/11/02
 #-------------------------------- PUBLIC ITEMS
 __all__ = [
     'create_bintablehdu',
@@ -149,6 +153,7 @@ def calibrate_to_power(pixelid, Troom, rhdus, ddb):
 #---------------- Convert times to FITS times
 #-------- Ascii time
 def convert_asciitime(asciitime):
+    asciitime = asciitime.astype(np.str)
     if len(asciitime[0]) <= 14:
         asciitime = [datetime.strptime(t, '%Y%m%d%H%M%S') for t in asciitime]
         form_fitstime = FORM_FITSTIME

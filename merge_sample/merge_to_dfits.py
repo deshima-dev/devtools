@@ -17,7 +17,6 @@ from astropy import coordinates
 from astropy import units
 import functions as fc
 
-
 #-------------------------------- CONSTANTS
 TELESCOP        = 'ASTE'
 D_ASTE          = (10.0* units.m).value                        # Diameter  of the ASTE
@@ -46,26 +45,28 @@ class MergeToDfits:
 
         Get HDUList of DFITS:
         >>> mtd = MergeToDfits(
-                      ddbfits,
-                      obsinst,
-                      antennalog,
-                      rout_data)
+                ddbfits=ddbfits,
+                obsinst=obsinst,
+                antennalog=antennalog,
+                rout_data=rout_data
+            )
         >>> dfits = mtd.dfits
         >>> dfits.indo()
         Filename: (No file associated with this HDUList)
         No.    Name         Type      Cards   Dimensions   Format
         0  PRIMARY     PrimaryHDU       4   ()
-        1  OBSINFO     BinTableHDU     52   1R x 11C   ['K', 'D', 'D', 'D', 'D', 'D', 'D', '63K', '63K', '63D', '63D']
+        1  OBSINFO     BinTableHDU     52   1R x 11C   ['K', 'D', 'D', 'D', 'D', 'D', 'D', '63K', '63K', '63K', '63D']
         2  ANTENNA     BinTableHDU     32   3854R x 8C   ['26A', '4A', 'D', 'D', 'D', 'D', 'D', 'D']
         3  READOUT     BinTableHDU     20   29234R x 4C   ['26A', 'K', '63D', '63D']
 
         Get each HDU:
         >>> mtd = MergeToDfits(
-                      ddbfits,
-                      obsinst,
-                      antennalog,
-                      rout_data,
-                      weatherlog)
+                ddbfits=ddbfits,
+                obsinst=obsinst,
+                antennalog=antennalog,
+                rout_data=rout_data,
+                weatherlog=weatherlog
+            )
         >>> obsinfo = mtd.obsinfo
         >>> antenna = mtd.antenna
         >>> readout = mtd.readout
@@ -79,10 +80,9 @@ class MergeToDfits:
         self.antennalog = str(Path(antennalog).expanduser())
         self.rout_data  = str(Path(rout_data).expanduser())
         if weatherlog is None:
-            self.weatherflag = 0
+            self.wflag = 0
         else:
             self.weatherlog = str(Path(weatherlog).expanduser())
-            self.weather    # WEATHER
 
 #-------- DFITS Dictionary
         with open(PATH_DFITSDICT, 'r') as f:
@@ -104,7 +104,7 @@ class MergeToDfits:
         hdus.append(self.obsinfo)        # OBSINFO
         hdus.append(self.antenna)        # ANTENNA
         hdus.append(self.readout)        # READOUT
-        if self.weatherflag != 0:
+        if self.wflag != 0:
             hdus.append(self.weather)    # WEATHER
 
         return hdus
@@ -159,7 +159,7 @@ class MergeToDfits:
 
 #-------- Read 'antennalog'
         antlog_data = ascii.read(self.antennalog)[:-1]
-        self.ant_time = fc.convert_asciitime(antlog_data['time'].astype(np.str))
+        self.ant_time = fc.convert_asciitime(antlog_data['time'])
         self.ant_ra   = antlog_data['ra-prg']
         self.ant_dec  = antlog_data['dec-prg']
 #---- Get Values for Columns
@@ -200,7 +200,7 @@ class MergeToDfits:
     @property
     def weather(self):
 #-------- Error Handling: Case of 'weatherlog' is None
-        if self.weatherflag == 0:
+        if self.wflag == 0:
             raise ValueError('No "weatherlog" is inputed!!')
 #-------- Get the Dicitinary of 'READOUT': 'readout_dict'
         wd = self.dfits_dict['weather_dict']
@@ -209,7 +209,7 @@ class MergeToDfits:
 #-------- Read 'weatherlog'
         wlog_data = ascii.read(self.weatherlog)
 #---- Get Values for Columns
-        wd['col_vals']['time']           = fc.convert_asciitime(wlog_data['time'].astype(np.str))
+        wd['col_vals']['time']           = fc.convert_asciitime(wlog_data['time'])
         wd['col_vals']['temperature']    = wlog_data['tmperature']
         wd['col_vals']['pressure']       = wlog_data['presure']
         wd['col_vals']['vapor-pressure'] = wlog_data['vapor-pressure']
