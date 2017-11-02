@@ -1,15 +1,16 @@
 kidsinfo_dict:
   cols_data_lis: null
-  cols_key_lis: [pixelid, kidid, kidtypes, bandpass, lorentz]
+  cols_key_lis: [pixelid, kidid, kidtypes, kid_freqs, bandpass, lorentz]
   hdr_com_lis: [name of binary table, 'filename??', null, null, null, null, null,
     null, null, label for field 1, data format of field 1, label for field 2, data
       format of field 2, label for field 3, data format of field 3, label for field
       4, data format of field 4, data unit of field 4, label for field 5, data format
-      of field 5, data unit of field 5]
+      of field 5, data unit of field 5, label for field 6, data format of field 6,
+    data unit of field 6]
   hdr_key_lis: [EXTNAME, FILENAME, KIDTYPE0, KIDTYPE1, KIDTYPE2, CTYPE3, CRVAL3, CRPIX3,
     CDELT3]
-  hdr_val_lis: [KIDSINFO, null, signal, absorber, blind, FREQ, 0.0, 0.0, null]
-  tform: [K, K, K, 400D, 4D]
+  hdr_val_lis: [KIDSINFO, null, wideband, filter, blind, FREQ, 0.0, 0.0, null]
+  tform: [K, K, K, 63D, 400D, 4D]
   tunit: [null, null, null, a.u., a.u.]
 rcp_dict:
   cols_data_lis: null

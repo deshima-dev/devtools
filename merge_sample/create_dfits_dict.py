@@ -170,7 +170,7 @@ def weather_dict():
                 'TUNIT5': 'data unit of field 5',
                 'TTYPE6': 'label for field 6',
                 'TFORM6': 'data format of field 6',
-                'TUNIT6': 'data unit of field 6',}
+                'TUNIT6': 'data unit of field 6'}
     col_vals = OrderedDict([('time', None), ('temperature', None), ('pressure', None),
                             ('vapor-pressure', None), ('windspd', None), ('winddir', None)])
     col_form = OrderedDict([('time', '19A'), ('temperature', 'D'), ('pressure', 'D'),
