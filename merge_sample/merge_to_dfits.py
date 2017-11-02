@@ -64,7 +64,8 @@ class MergeToDfits:
                       ddbfits,
                       obsinst,
                       antennalog,
-                      rout_data)
+                      rout_data,
+                      weatherlog)
         >>> obsinfo = mtd.obsinfo
         >>> antenna = mtd.antenna
         >>> readout = mtd.readout
