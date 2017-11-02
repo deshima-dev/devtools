@@ -1,6 +1,6 @@
 # -*- coding utf-8 -*-
 #
-# maerge_to_dfits.py: Read logging data and merge them into a FITS object
+# merge_to_dfits.py: Read logging data and merge them into a FITS object
 #
 # Author : Tetsutaro Ueda
 # Created: 2017/11/02

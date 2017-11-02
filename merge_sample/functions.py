@@ -54,11 +54,11 @@ def load_obsinst(obsinst):
     with open(obsinst, 'r') as f:
         for line in f:
             if '% OBSERVER' in line:
-                observer = line.rstrip().split('=')[1]          # Get 'OBSERVER'
+                observer = line.rstrip().split('=')[1]                          # Get 'OBSERVER'
             elif '% SRC_NAME' in line:
-                obs_object = line.rstrip().split('=')[1]        # Get 'OBJECT'
+                obs_object = line.rstrip().split('=')[1]                        # Get 'OBJECT'
             elif '% EPOCH' in line:
-                equinox = line.rstrip().split('=')[1].strip('J').strip('B')   # Get 'EQUINOX'
+                equinox = line.rstrip().split('=')[1].strip('J').strip('B')     # Get 'EQUINOX'
 
     return observer, obs_object, equinox
 
@@ -79,7 +79,7 @@ def get_maskid_corresp(des, filt):
             sorted(mas_vs_attr, key=lambda x: x[0])
         )
     ]
-    kid_vs_attr = sorted(kid_vs_attr, key=lambda x: x[1])    # Sorted by 'kidid'
+    kid_vs_attr = sorted(kid_vs_attr, key=lambda x: x[1])   # Sorted by 'kidid'
     kid_vs_attr = list(map(list, zip(*kid_vs_attr)))        # Transpose
 #-------- Get Data
     masterids = np.array([kid_vs_attr[0]])
@@ -160,8 +160,9 @@ def convert_asciitime(asciitime):
 
     return np.array(asciitime)
 
-#-------- timestamp
+#-------- Timestamp
 def convert_timestamp(timestamp):
     timestamp = [datetime.utcfromtimestamp(t) for t in timestamp]
     timestamp = [datetime.strftime(t, FORM_FITSTIME_P) for t in timestamp]
+
     return np.array(timestamp)
