@@ -1,3 +1,9 @@
+# -*- coding utf-8 -*-
+#
+# maerge_to_dfits.py: Read logging data and merge them into a FITS object
+#
+# Author : Tetsutaro Ueda
+# Created: 2017/11/02
 #-------------------------------- IMPORT MODULES
 #-------- Standard Modules
 import os
@@ -115,8 +121,8 @@ class MergeToDfits:
         od['hdr_vals']['DATE-OBS'] = self.ant_time[0][:19]
         od['hdr_vals']['OBSERVER'] = obsinst_data[0]
         od['hdr_vals']['OBJECT']   = obsinst_data[1]
-        od['hdr_vals']['RA']       = np.mean(self.ant_ra[:-1])
-        od['hdr_vals']['DEC']      = np.mean(self.ant_dec[:-1])
+        od['hdr_vals']['RA']       = np.mean(self.ant_ra)
+        od['hdr_vals']['DEC']      = np.mean(self.ant_dec)
         od['hdr_vals']['EQUINOX']  = obsinst_data[2]
 #-------- Get DDBID and Values for Columns
         with fits.open(self.ddbfits) as f:

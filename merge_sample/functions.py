@@ -1,20 +1,21 @@
 # -*- coding utf-8 -*-
-
+#
 #-------------------------------- PUBLIC ITEMS
 __all__ = [
     'create_bintablehdu',
     'load_obsinst',
     'get_maskid_corresp'
-    'calibrate_to_power',    
+    'calibrate_to_power',
     'convert_asciitime',
     'convert_timestamp'
 ]
 
 #-------------------------------- IMPORT MODULES
+#-------- Standard Modules
+from datetime import datetime
 #-------- Dependent Packages
 import numpy as np
 import scipy.interpolate
-from datetime import datetime
 from astropy.io import fits
 
 #-------------------------------- DEFINE CONSTANTS
@@ -28,11 +29,14 @@ def create_bintablehdu(hd):
     for (i, j) in zip(hd['hdr_vals'].items(), hd['hdr_coms'].items()):
         header[i[0]] = i[1], j[1]
 
-    columns = [fits.Column(name=i[0], format=j[1], array=i[1], unit=k[1])
-               for (i, j, k) in zip(
-                   hd['col_vals'].items(),
-                   hd['col_form'].items(),
-                   hd['col_unit'].items())]
+    columns = [
+        fits.Column(name=i[0], format=j[1], array=i[1], unit=k[1])
+        for (i, j, k) in zip(
+            hd['col_vals'].items(),
+            hd['col_form'].items(),
+            hd['col_unit'].items()
+        )
+    ]
 
     hdu = fits.BinTableHDU.from_columns(columns, header)
 
@@ -68,10 +72,13 @@ def get_maskid_corresp(des, filt):
 #-------- Correspondance between 'masterid' and 'kidid'
     mas_vs_kid = [[x, y, z[0]] for (x, y, z) in zip(filt['masterid'], filt['kidid'], filt['F_filter, dF_filter'])]
 #-------- Correspondance between 'kidid' and 'attribute'
-    kid_vs_attr = [[x[0], x[1], y[1], x[2]]
-                   for (x, y) in zip(
-                       sorted(mas_vs_kid, key=lambda x: x[0]),
-                       sorted(mas_vs_attr, key=lambda x: x[0]))]
+    kid_vs_attr = [
+        [x[0], x[1], y[1], x[2]]
+         for (x, y) in zip(
+            sorted(mas_vs_kid, key=lambda x: x[0]),
+            sorted(mas_vs_attr, key=lambda x: x[0])
+        )
+    ]
     kid_vs_attr = sorted(kid_vs_attr, key=lambda x: x[1])    # Sorted by 'kidid'
     kid_vs_attr = list(map(list, zip(*kid_vs_attr)))        # Transpose
 #-------- Get Data
