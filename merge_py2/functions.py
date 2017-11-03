@@ -22,6 +22,10 @@ import numpy as np
 import scipy.interpolate
 from astropy.io import fits
 
+#-------------------------------- CONSTANTS
+FORM_FITSTIME   = '%Y-%m-%dT%H:%M:%S'                          # YYYY-mm-ddTHH:MM:SS
+FORM_FITSTIME_P = '%Y-%m-%dT%H:%M:%S.%f'                       # YYYY-mm-ddTHH:MM:SS.ss
+
 #-------------------------------- FUNCTIONS
 #---------------- Create Binary Table HDU from 'hdu_dict'
 def create_bintablehdu(hd):
