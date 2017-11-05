@@ -6,15 +6,13 @@
 # Created: 2017/11/02
 #-------------------------------- IMPORT MODULES
 #-------- Standard Modules
-from pathlib import Path
+import os
 from collections import OrderedDict
 #-------- Dependent Packages
 import yaml
 
-
 #-------------------------------- DEFINE CONSTANTS
-PATH_DFITSDICT = Path('~/DESHIMA/devtools/merge_sample/dfits_dict.yaml').expanduser()
-
+PATH_DFITSDICT = os.path('~/DESHIMA/devtools/merge_sample/dfits_dict.yaml').expanduser()
 
 #-------------------------------- CREATE DICTIONARIES
 #---------------- OBSINFO
