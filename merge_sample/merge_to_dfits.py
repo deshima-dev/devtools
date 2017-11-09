@@ -6,7 +6,6 @@
 # Created: 2017/11/02
 #-------------------------------- IMPORT MODULES
 #-------- Standard Modules
-import os
 from pathlib import Path
 #-------- Dependent Packages
 import yaml
@@ -22,7 +21,7 @@ TELESCOP        = 'ASTE'
 D_ASTE          = (10.0* units.m).value                        # Diameter  of the ASTE
 LON_ASTE        = coordinates.Angle('-67d42m11.89525s').deg    # Longitude of the ASTE
 LAT_ASTE        = coordinates.Angle('-22d58m17.69447s').deg    # Latitude  of the ASTE
-PATH_DFITSDICT  = str(Path('~/DESHIMA/devtools/merge_sample/dfits_dict.yaml').expanduser())
+PATH_DFITSDICT  = Path('~/DESHIMA/devtools/merge_sample/dfits_dict.yaml').expanduser()
 
 
 class MergeToDfits:
@@ -75,17 +74,17 @@ class MergeToDfits:
 
     def __init__(self, ddbfits, obsinst, antennalog, rout_data, weatherlog=None):
 #-------- Path
-        self.ddbfits    = str(Path(ddbfits).expanduser())
-        self.obsinst    = str(Path(obsinst).expanduser())
-        self.antennalog = str(Path(antennalog).expanduser())
-        self.rout_data  = str(Path(rout_data).expanduser())
+        self.ddbfits    = Path(ddbfits).expanduser()
+        self.obsinst    = Path(obsinst).expanduser()
+        self.antennalog = Path(antennalog).expanduser()
+        self.rout_data  = Path(rout_data).expanduser()
         if weatherlog is None:
             self.wflag = 0
         else:
-            self.weatherlog = str(Path(weatherlog).expanduser())
+            self.weatherlog = Path(weatherlog).expanduser()
 
 #-------- DFITS Dictionary
-        with open(PATH_DFITSDICT, 'r') as f:
+        with PATH_DFITSDICT.open() as f:
             self.dfits_dict = yaml.load(f)
 
 #-------- HDU
@@ -164,7 +163,7 @@ class MergeToDfits:
 #-------- Get the Dicitinary of 'ANTENNA': 'antenna_dict'
         ad = self.dfits_dict['antenna_dict']
 #---- Get Header Values
-        ad['hdr_vals']['FILENAME'] = os.path.basename(self.antennalog)
+        ad['hdr_vals']['FILENAME'] = self.antennalog.name
 
 #-------- Read 'antennalog'
         antlog_data = ascii.read(self.antennalog)[:-1]
@@ -192,7 +191,7 @@ class MergeToDfits:
 #-------- Get the Dicitinary of 'READOUT': 'readout_dict'
         rd = self.dfits_dict['readout_dict']
 #---- Get Header Values
-        rd['hdr_vals']['FILENAME'] = os.path.basename(self.rout_data)
+        rd['hdr_vals']['FILENAME'] = self.rout_data.name
 #-------- Open 'DDB' and 'rout_data'
         ddb   = fits.open(self.ddbfits)
         rhdus = fits.open(self.rout_data)
@@ -220,7 +219,7 @@ class MergeToDfits:
 #-------- Get the Dicitinary of 'READOUT': 'readout_dict'
         wd = self.dfits_dict['weather_dict']
 #---- Get Header Values
-        wd['hdr_vals']['FILENAME'] = os.path.basename(self.weatherlog)
+        wd['hdr_vals']['FILENAME'] = self.weatherlog.name
 #-------- Read 'weatherlog'
         wlog_data = ascii.read(self.weatherlog)
 #---- Get Values for Columns

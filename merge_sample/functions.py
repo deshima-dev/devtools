@@ -52,7 +52,7 @@ def create_bintablehdu(hd):
 
 #---------------- Get data for 'OBSINFO'
 def load_obsinst(obsinst):
-    if not '.obs' in obsinst:
+    if not '.obs' in obsinst.name:
         raise ValueError('The input file must be an observational instruction!!')
 
     with open(obsinst, 'r') as f:
