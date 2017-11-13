@@ -56,15 +56,29 @@ def load_obsinst(obsinst):
         raise ValueError('The input file must be an observational instruction!!')
 
     with open(obsinst, 'r') as f:
+        equinox = 2000  # Default parameter
         for line in f:
-            if '% OBSERVER' in line:
-                observer = line.rstrip().split('=')[1]                          # Get 'OBSERVER'
-            elif '% SRC_NAME' in line:
-                obs_object = line.rstrip().split('=')[1]                        # Get 'OBJECT'
-            elif '% EPOCH' in line:
-                equinox = line.rstrip().split('=')[1].strip('J').strip('B')     # Get 'EQUINOX'
+            if 'SET ANTENNA_G TRK_TYPE' in line:
+                trktype = line.split()[-1].strip('\'')
+            elif 'SET ANTENNA_G SRC_NAME' in line:
+                obs_object = line.split()[-1].strip('\'')
+            elif 'SET ANTENNA_G SRC_POS' in line:
+                srcpos = [float(c) for c in line.split()[-1].strip('()').split(',')]
+            elif 'SET ANTENNA_G EPOCH' in line:
+                equinox = line.split()[-1].strip('\'JB')
+            elif 'SET DES OBS_USER' in line:
+                observer = line.split()[-1].strip('\'')
 
-    return observer, obs_object, equinox
+    if trktype == 'RADEC':
+        ra  = srcpos[0]
+        dec = srcpos[1]
+    else:
+        ra  = 0
+        dec = 0
+
+    return {
+        'observer': observer, 'obs_object': obs_object,  'ra': ra, 'dec': dec, 'equinox': equinox
+    }
 
 
 #---------------- Get Correspondance of 'master' and 'kid'

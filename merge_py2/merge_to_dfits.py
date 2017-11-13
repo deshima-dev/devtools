@@ -122,16 +122,16 @@ class MergeToDfits:
 #-------- Get the Dicitinary of 'OBSINFO': 'obsinfo_dict'
         od = self.dfits_dict['obsinfo_dict']
 #-------- Get Header Values
-        obsinst_data = fc.load_obsinst(self.obsinst)
+        obsinst_dict = fc.load_obsinst(self.obsinst)
         od['hdr_vals']['TELESCOP'] = TELESCOP
         od['hdr_vals']['SITELON']  = LON_ASTE
         od['hdr_vals']['SITELAT']  = LAT_ASTE
         od['hdr_vals']['DATE-OBS'] = self.ant_time[0][:19]
-        od['hdr_vals']['OBSERVER'] = obsinst_data[0]
-        od['hdr_vals']['OBJECT']   = obsinst_data[1]
-        od['hdr_vals']['RA']       = np.mean(self.ant_ra)
-        od['hdr_vals']['DEC']      = np.mean(self.ant_dec)
-        od['hdr_vals']['EQUINOX']  = obsinst_data[2]
+        od['hdr_vals']['OBSERVER'] = obsinst_dict['observer']
+        od['hdr_vals']['OBJECT']   = obsinst_dict['obs_object']
+        od['hdr_vals']['RA']       = obsinst_dict['ra']
+        od['hdr_vals']['DEC']      = obsinst_dict['dec']
+        od['hdr_vals']['EQUINOX']  = obsinst_dict['equinox']
 #-------- Get DDBID and Values for Columns
         with fits.open(self.ddbfits) as f:
             od['hdr_vals']['DDBID'] = f['PRIMARY'].header['DDB_ID']
@@ -170,15 +170,24 @@ class MergeToDfits:
 #-------- Read 'antennalog'
         antlog_data = ascii.read(self.antennalog)[:-1]
         self.ant_time = fc.convert_asciitime(antlog_data['time'], FORM_FITSTIME_P)
-        self.ant_ra   = antlog_data['ra-prg']
-        self.ant_dec  = antlog_data['dec-prg']
 #---- Get Values for Columns
+#        try:
         ad['col_vals']['time']      = self.ant_time
         ad['col_vals']['scantype']  = antlog_data['type']
-        ad['col_vals']['az']        = antlog_data['az-real']
-        ad['col_vals']['el']        = antlog_data['el-real']
-        ad['col_vals']['ra']        = self.ant_ra
-        ad['col_vals']['dec']       = self.ant_dec
+        ad['col_vals']['az']        = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
+        ad['col_vals']['el']        = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        ad['col_vals']['ra']        = antlog_data['ra-prg']
+        ad['col_vals']['dec']       = antlog_data['dec-prg']
+        ad['col_vals']['az_center'] = antlog_data['az-prog(center)']
+        ad['col_vals']['el_center'] = antlog_data['el-prog(center)']
+
+#        except KeyError:
+        ad['col_vals']['time']      = self.ant_time
+        ad['col_vals']['scantype']  = antlog_data['type']
+        ad['col_vals']['az']        = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
+        ad['col_vals']['el']        = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        ad['col_vals']['ra']        = antlog_data['ra-prg']
+        ad['col_vals']['dec']       = antlog_data['dec-prg']
         ad['col_vals']['az_center'] = antlog_data['az-prog(center)']
         ad['col_vals']['el_center'] = antlog_data['el-prog(center)']
 
@@ -200,8 +209,16 @@ class MergeToDfits:
 #---- Define Troom (Not confirmed)
         Troom = 17. + 273
 #---- Get Values for Columns
+        nkid = rhdus['READOUT'].header['NKID0']
+        reduce_data = np.transpose(
+            [rhdus['READOUT'].data['Amp, Ph, linPh %d' %i].T for i in range(nkid)]
+        )
+
         rd['col_vals']['starttime'] = fc.convert_timestamp(rhdus['READOUT'].data['timestamp'])
         rd['col_vals']['pixelid']   = rhdus['READOUT'].data['pixelid']
+        rd['col_vals']['amplitude']  = reduce_data[:, 0]
+        rd['col_vals']['phase']      = reduce_data[:, 1]
+        rd['col_vals']['line_phase'] = reduce_data[:, 2]
         rd['col_vals']['Tsignal'], rd['col_vals']['Psignal'] = fc.calibrate_to_power(0, Troom, rhdus, ddb)
 #-------- Close 'DDB' and 'rout_data'
         ddb.close()

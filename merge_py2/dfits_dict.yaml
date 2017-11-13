@@ -232,6 +232,12 @@ readout_dict:
       - 26A
     - - pixelid
       - K
+    - - Amplitude
+      - 63D
+    - - Phase
+      - 63D
+    - - Line_Phase
+      - 63D
     - - Tsignal
       - 63D
     - - Psignal
@@ -241,6 +247,12 @@ readout_dict:
       - null
     - - pixelid
       - null
+    - - Amplitude
+      - ??
+    - - Phase
+      - ??
+    - - Line_Phase
+      - ??
     - - Tsignal
       - K
     - - Psignal
@@ -249,6 +261,12 @@ readout_dict:
   - - - starttime
       - null
     - - pixelid
+      - null
+    - - amplitude
+      - null
+    - - phase
+      - null
+    - - line_phase
       - null
     - - Tsignal
       - null
@@ -261,12 +279,21 @@ readout_dict:
     TFORM2: data format of field 2
     TFORM3: data format of field 3
     TFORM4: data format of field 4
+    TFORM5: data format of field 5
+    TFORM6: data format of field 6
+    TFORM7: data format of field 7
     TTYPE1: label for field 1
     TTYPE2: label for field 2
     TTYPE3: label for field 3
     TTYPE4: label for field 4
+    TTYPE5: label for field 5
+    TTYPE6: label for field 6
+    TTYPE7: label for field 7
     TUNIT3: data unit of field 3
     TUNIT4: data unit of field 4
+    TUNIT5: data unit of field 5
+    TUNIT6: data unit of field 6
+    TUNIT7: data unit of field 7
   hdr_vals: !!python/object/apply:collections.OrderedDict
   - - - EXTNAME
       - READOUT
