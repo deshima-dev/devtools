@@ -198,8 +198,16 @@ class MergeToDfits:
 #---- Define Troom (Not confirmed)
         Troom = 17. + 273
 #---- Get Values for Columns
-        rd['col_vals']['starttime'] = fc.convert_timestamp(rhdus['READOUT'].data['timestamp'])
-        rd['col_vals']['pixelid']   = rhdus['READOUT'].data['pixelid']
+        nkid = rhdus['READOUT'].header['NKID0']
+        reduce_data = np.transpose(
+            [rhdus['READOUT'].data['Amp, Ph, linPh %d' %i].T for i in range(nkid)]
+        )
+
+        rd['col_vals']['starttime']  = fc.convert_timestamp(rhdus['READOUT'].data['timestamp'])
+        rd['col_vals']['pixelid']    = rhdus['READOUT'].data['pixelid']
+        rd['col_vals']['amplitude']  = reduce_data[:, 0]
+        rd['col_vals']['phase']      = reduce_data[:, 1]
+        rd['col_vals']['line_phase'] = reduce_data[:, 2]
         rd['col_vals']['Tsignal'], rd['col_vals']['Psignal'] = fc.calibrate_to_power(0, Troom, rhdus, ddb)
 #-------- Close 'DDB' and 'rout_data'
         ddb.close()
