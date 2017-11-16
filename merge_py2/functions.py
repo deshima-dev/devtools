@@ -80,7 +80,6 @@ def load_obsinst(obsinst):
         'observer': observer, 'obs_object': obs_object,  'ra': ra, 'dec': dec, 'equinox': equinox
     }
 
-
 #---------------- Get Correspondance of 'master' and 'kid'
 def get_maskid_corresp(des, filt):
 #-------- Correspondance between 'masterid' and 'attribute'

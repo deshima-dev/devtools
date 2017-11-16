@@ -83,6 +83,7 @@ class MergeToDfits:
         if weatherlog is None:
             self.wflag = 0
         else:
+            self.wflag = 1
             self.weatherlog = os.path.expanduser(weatherlog)
 
 #-------- DFITS Dictionary
@@ -108,6 +109,7 @@ class MergeToDfits:
         hdus.append(self.obsinfo)        # OBSINFO
         hdus.append(self.antenna)        # ANTENNA
         hdus.append(self.readout)        # READOUT
+        hdus.append(self.kidsinfo)       # KIDSINFO
         if self.wflag != 0:
             hdus.append(self.weather)    # WEATHER
 
@@ -171,21 +173,14 @@ class MergeToDfits:
         antlog_data = ascii.read(self.antennalog)[:-1]
         self.ant_time = fc.convert_asciitime(antlog_data['time'], FORM_FITSTIME_P)
 #---- Get Values for Columns
-#        try:
         ad['col_vals']['time']      = self.ant_time
         ad['col_vals']['scantype']  = antlog_data['type']
-        ad['col_vals']['az']        = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
-        ad['col_vals']['el']        = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
-        ad['col_vals']['ra']        = antlog_data['ra-prg']
-        ad['col_vals']['dec']       = antlog_data['dec-prg']
-        ad['col_vals']['az_center'] = antlog_data['az-prog(center)']
-        ad['col_vals']['el_center'] = antlog_data['el-prog(center)']
-
-#        except KeyError:
-        ad['col_vals']['time']      = self.ant_time
-        ad['col_vals']['scantype']  = antlog_data['type']
-        ad['col_vals']['az']        = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
-        ad['col_vals']['el']        = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        try:
+            ad['col_vals']['az'] = antlog_data['az-prg(no-cor)'] + antlog_data['az-real'] - antlog_data['az-prg']
+            ad['col_vals']['el'] = antlog_data['el-prog(no-cor)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        except:
+            ad['col_vals']['az'] = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
+            ad['col_vals']['el'] = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
         ad['col_vals']['ra']        = antlog_data['ra-prg']
         ad['col_vals']['dec']       = antlog_data['dec-prg']
         ad['col_vals']['az_center'] = antlog_data['az-prog(center)']
@@ -225,6 +220,16 @@ class MergeToDfits:
         rhdus.close()
 
         return fc.create_bintablehdu(rd)
+
+#---------------- KIDSINFO
+    @property
+    def kidsinfo(self):
+        """
+            HDU of 'KIDSINFO'
+        """
+        kidsinfo = fits.open(self.rout_data)['KIDSINFO']
+
+        return kidsinfo
 
 #---------------- WEATHER
     @property

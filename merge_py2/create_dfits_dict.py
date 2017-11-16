@@ -190,7 +190,7 @@ def readout_dict():
 
 #---------------- WEATHER
 def weather_dict():
-    hdr_vals = OrderedDict([('WEATHER', 'ANTENNA'), ('FILENAME', None)])
+    hdr_vals = OrderedDict([('EXTNAME', 'WEATHER'), ('FILENAME', None)])
     hdr_coms = {
         'EXTNAME': 'name of binary table',
         'FILENAME': 'filename of "Weather Log"',

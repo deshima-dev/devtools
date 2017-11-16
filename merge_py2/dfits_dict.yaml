@@ -360,7 +360,7 @@ weather_dict:
     TUNIT5: data unit of field 5
     TUNIT6: data unit of field 6
   hdr_vals: !!python/object/apply:collections.OrderedDict
-  - - - WEATHER
-      - ANTENNA
+  - - - EXTNAME
+      - WEATHER
     - - FILENAME
       - null
