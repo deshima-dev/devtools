@@ -81,10 +81,11 @@ class MergeToDfits:
         if weatherlog is None:
             self.wflag = 0
         else:
+            self.wflag = 1
             self.weatherlog = Path(weatherlog).expanduser()
 
 #-------- DFITS Dictionary
-        with PATH_DFITSDICT.open() as f:
+        with PATH_DFITSDICT.open('r') as f:
             self.dfits_dict = yaml.load(f)
 
 #-------- HDU
@@ -106,6 +107,7 @@ class MergeToDfits:
         hdus.append(self.obsinfo)        # OBSINFO
         hdus.append(self.antenna)        # ANTENNA
         hdus.append(self.readout)        # READOUT
+        hdus.append(self.kidsinfo)       # KIDSINFO
         if self.wflag != 0:
             hdus.append(self.weather)    # WEATHER
 
@@ -120,16 +122,16 @@ class MergeToDfits:
 #-------- Get the Dicitinary of 'OBSINFO': 'obsinfo_dict'
         od = self.dfits_dict['obsinfo_dict']
 #-------- Get Header Values
-        obsinst_data = fc.load_obsinst(self.obsinst)
+        obsinst_dict = fc.load_obsinst(self.obsinst)
         od['hdr_vals']['TELESCOP'] = TELESCOP
         od['hdr_vals']['SITELON']  = LON_ASTE
         od['hdr_vals']['SITELAT']  = LAT_ASTE
         od['hdr_vals']['DATE-OBS'] = self.ant_time[0][:19]
-        od['hdr_vals']['OBSERVER'] = obsinst_data[0]
-        od['hdr_vals']['OBJECT']   = obsinst_data[1]
-        od['hdr_vals']['RA']       = np.mean(self.ant_ra)
-        od['hdr_vals']['DEC']      = np.mean(self.ant_dec)
-        od['hdr_vals']['EQUINOX']  = obsinst_data[2]
+        od['hdr_vals']['OBSERVER'] = obsinst_dict['observer']
+        od['hdr_vals']['OBJECT']   = obsinst_dict['obs_object']
+        od['hdr_vals']['RA']       = obsinst_dict['ra']
+        od['hdr_vals']['DEC']      = obsinst_dict['dec']
+        od['hdr_vals']['EQUINOX']  = obsinst_dict['equinox']
 #-------- Get DDBID and Values for Columns
         with fits.open(self.ddbfits) as f:
             od['hdr_vals']['DDBID'] = f['PRIMARY'].header['DDB_ID']
@@ -173,10 +175,14 @@ class MergeToDfits:
 #---- Get Values for Columns
         ad['col_vals']['time']      = self.ant_time
         ad['col_vals']['scantype']  = antlog_data['type']
-        ad['col_vals']['az']        = antlog_data['az-real']
-        ad['col_vals']['el']        = antlog_data['el-real']
-        ad['col_vals']['ra']        = self.ant_ra
-        ad['col_vals']['dec']       = self.ant_dec
+        try:
+            ad['col_vals']['az'] = antlog_data['az-prg(no-cor)'] + antlog_data['az-real'] - antlog_data['az-prg']
+            ad['col_vals']['el'] = antlog_data['el-prog(no-cor)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        except:
+            ad['col_vals']['az'] = antlog_data['az-prg(no-col)'] + antlog_data['az-real'] - antlog_data['az-prg']
+            ad['col_vals']['el'] = antlog_data['el-prog(no-col)'] + antlog_data['el-real'] - antlog_data['el-prg']
+        ad['col_vals']['ra']        = antlog_data['ra-prg']
+        ad['col_vals']['dec']       = antlog_data['dec-prg']
         ad['col_vals']['az_center'] = antlog_data['az-prog(center)']
         ad['col_vals']['el_center'] = antlog_data['el-prog(center)']
 
@@ -214,6 +220,14 @@ class MergeToDfits:
         rhdus.close()
 
         return fc.create_bintablehdu(rd)
+
+
+#---------------- KIDSINFO
+    @property
+    def kidsinfo(self):
+        kidsinfo = fits.open(self.rout_data)['KIDSINFO']
+
+        return kidsinfo
 
 #---------------- WEATHER
     @property
